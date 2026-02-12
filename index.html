@@ -1,0 +1,1678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VPN Configuration Guide - Unifi CGU WireGuard Site-to-Site</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary-color: #475569;
+            --success-color: #16a34a;
+            --warning-color: #ea580c;
+            --danger-color: #dc2626;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --text-color: #1e293b;
+            --text-muted: #64748b;
+            --code-bg: #1e293b;
+            --code-text: #e2e8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .header-meta {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .header-meta span {
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        /* Navigation */
+        .nav-container {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            flex-wrap: wrap;
+        }
+
+        .nav a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            white-space: nowrap;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .nav a:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Sections */
+        section {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid var(--border-color);
+        }
+
+        h2 {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--primary-color);
+        }
+
+        h3 {
+            color: var(--text-color);
+            font-size: 1.4rem;
+            margin: 1.5rem 0 1rem;
+        }
+
+        h4 {
+            color: var(--secondary-color);
+            font-size: 1.1rem;
+            margin: 1.5rem 0 0.75rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.95rem;
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border: 1px solid var(--border-color);
+        }
+
+        th {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background: var(--bg-color);
+        }
+
+        tr:hover {
+            background: #e0e7ff;
+        }
+
+        /* Code Blocks */
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+            font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        code {
+            font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
+        }
+
+        p code, li code, td code {
+            background: #e0e7ff;
+            color: var(--primary-dark);
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.9em;
+        }
+
+        /* Diagram */
+        .diagram {
+            background: #f1f5f9;
+            border: 2px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            overflow-x: auto;
+            font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        /* Lists */
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Checklist */
+        .checklist {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .checklist li {
+            padding: 0.5rem 0;
+            padding-left: 2rem;
+            position: relative;
+        }
+
+        .checklist li::before {
+            content: "☐";
+            position: absolute;
+            left: 0;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+        }
+
+        /* Info Boxes */
+        .info-box {
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+            border-left: 4px solid;
+        }
+
+        .info-box.note {
+            background: #dbeafe;
+            border-color: var(--primary-color);
+        }
+
+        .info-box.warning {
+            background: #fef3c7;
+            border-color: var(--warning-color);
+        }
+
+        .info-box.success {
+            background: #dcfce7;
+            border-color: var(--success-color);
+        }
+
+        .info-box.danger {
+            background: #fee2e2;
+            border-color: var(--danger-color);
+        }
+
+        .info-box strong {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Steps */
+        .step {
+            background: var(--bg-color);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .step-number {
+            background: var(--primary-color);
+            color: white;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .step-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        /* Config Box */
+        .config-box {
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .config-box-header {
+            background: var(--secondary-color);
+            color: white;
+            padding: 0.75rem 1rem;
+            font-weight: 600;
+        }
+
+        .config-box-body {
+            padding: 1rem;
+        }
+
+        .config-box table {
+            margin: 0;
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .badge.success {
+            background: #dcfce7;
+            color: var(--success-color);
+        }
+
+        .badge.danger {
+            background: #fee2e2;
+            color: var(--danger-color);
+        }
+
+        /* Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .grid-item {
+            background: var(--bg-color);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .grid-item h4 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 2rem;
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        /* Print Styles */
+        @media print {
+            .nav-container {
+                display: none;
+            }
+
+            .header {
+                background: var(--primary-color) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            section {
+                break-inside: avoid;
+                box-shadow: none;
+                border: 1px solid #ccc;
+            }
+
+            pre {
+                white-space: pre-wrap;
+                word-wrap: break-word;
+            }
+
+            body {
+                font-size: 12pt;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            section {
+                padding: 1.5rem;
+            }
+
+            table {
+                font-size: 0.85rem;
+            }
+
+            th, td {
+                padding: 0.5rem;
+            }
+
+            pre {
+                font-size: 0.8rem;
+                padding: 1rem;
+            }
+        }
+
+        /* Copy button for code */
+        .code-container {
+            position: relative;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: var(--primary-color);
+        }
+
+        /* TOC */
+        .toc {
+            background: var(--bg-color);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+        }
+
+        .toc ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .toc li {
+            margin-bottom: 0.5rem;
+        }
+
+        .toc a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+
+        .toc .toc-section {
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        .toc .toc-subsection {
+            padding-left: 1.5rem;
+            font-weight: normal;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <h1>🔐 VPN Configuration Guide</h1>
+        <p>Unifi Cloud Gateway Ultra with WireGuard Site-to-Site VPN</p>
+        <div class="header-meta">
+            <span>📋 Version 1.0</span>
+            <span>🔧 WireGuard Protocol</span>
+            <span>📅 2026</span>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <div class="nav-container">
+        <nav class="nav">
+            <a href="#overview">Overview</a>
+            <a href="#server">VPN Server</a>
+            <a href="#client1">CGU Client</a>
+            <a href="#client2">RUT200</a>
+            <a href="#testing">Testing</a>
+            <a href="#reference">Reference</a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+
+        <!-- Section 1: Overview -->
+        <section id="overview">
+            <h2>📊 Section 1: Network Overview</h2>
+
+            <h3>1.1 Network Topology Diagram</h3>
+            <div class="diagram">
+<pre>
+                         INTERNET
+                            │
+                            │
+                +-----------+-----------+
+                │                       │
+                │   VPN SERVER (CGU)    │
+                │   WireGuard Server    │
+                │   Tunnel: 10.10.10.1  │
+                │                       │
+                +---+---------------+---+
+                    │               │
+               Port 1          Port 2
+                LAN1             LAN2
+            10.20.1.0/24     10.20.2.0/24
+                    │               │
+                    │               │
+        +-----------+               +-----------+
+        │                                       │
+        │ WireGuard                   WireGuard │
+        │ Tunnel                         Tunnel │
+        │                                       │
++-------+-------+                   +-----------+---+
+│               │                   │               │
+│ CGU CLIENT    │                   │ RUT200        │
+│ Tunnel:       │                   │ Tunnel:       │
+│ 10.10.10.2    │                   │ 10.10.10.3    │
+│ LAN:          │                   │ LAN:          │
+│ 192.168.1.0/24│                   │ 192.168.2.0/24│
+│               │                   │ (4G Internet) │
++---------------+                   +---------------+
+</pre>
+            </div>
+
+            <h3>1.2 IP Address Allocation</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Device</th>
+                        <th>Role</th>
+                        <th>Tunnel IP</th>
+                        <th>LAN Network</th>
+                        <th>WAN</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>CGU Server</strong></td>
+                        <td>VPN Server</td>
+                        <td><code>10.10.10.1/24</code></td>
+                        <td>LAN1: <code>10.20.1.0/24</code><br>LAN2: <code>10.20.2.0/24</code></td>
+                        <td>Static/Dynamic</td>
+                    </tr>
+                    <tr>
+                        <td><strong>CGU Client</strong></td>
+                        <td>VPN Client 1</td>
+                        <td><code>10.10.10.2/32</code></td>
+                        <td><code>192.168.1.0/24</code></td>
+                        <td>Static/Dynamic</td>
+                    </tr>
+                    <tr>
+                        <td><strong>RUT200</strong></td>
+                        <td>VPN Client 2</td>
+                        <td><code>10.10.10.3/32</code></td>
+                        <td><code>192.168.2.0/24</code></td>
+                        <td>4G Mobile</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>1.3 Access Control Matrix</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Source Network</th>
+                        <th>Destination Network</th>
+                        <th>Access</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>192.168.1.0/24 (CGU Client)</td>
+                        <td>10.20.1.0/24 (LAN1)</td>
+                        <td><span class="badge success">ALLOWED</span></td>
+                    </tr>
+                    <tr>
+                        <td>10.20.1.0/24 (LAN1)</td>
+                        <td>192.168.1.0/24 (CGU Client)</td>
+                        <td><span class="badge success">ALLOWED</span></td>
+                    </tr>
+                    <tr>
+                        <td>192.168.2.0/24 (RUT200)</td>
+                        <td>10.20.2.0/24 (LAN2)</td>
+                        <td><span class="badge success">ALLOWED</span></td>
+                    </tr>
+                    <tr>
+                        <td>10.20.2.0/24 (LAN2)</td>
+                        <td>192.168.2.0/24 (RUT200)</td>
+                        <td><span class="badge success">ALLOWED</span></td>
+                    </tr>
+                    <tr>
+                        <td>192.168.1.0/24 (CGU Client)</td>
+                        <td>10.20.2.0/24 (LAN2)</td>
+                        <td><span class="badge danger">BLOCKED</span></td>
+                    </tr>
+                    <tr>
+                        <td>192.168.2.0/24 (RUT200)</td>
+                        <td>10.20.1.0/24 (LAN1)</td>
+                        <td><span class="badge danger">BLOCKED</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>1.4 WireGuard Port Information</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Protocol</td><td>UDP</td></tr>
+                    <tr><td>Port</td><td>51820</td></tr>
+                    <tr><td>Encryption</td><td>ChaCha20</td></tr>
+                    <tr><td>Authentication</td><td>Poly1305</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Section 2: VPN Server Configuration -->
+        <section id="server">
+            <h2>🖥️ Section 2: VPN Server Configuration (Main CGU)</h2>
+
+            <h3>2.1 Pre-Configuration Requirements</h3>
+            <ul class="checklist">
+                <li>Administrative access to CGU Server</li>
+                <li>Public IP address or DDNS hostname for VPN Server</li>
+                <li>SSH access enabled (for CLI configuration)</li>
+                <li>UDP port 51820 forwarded (if behind NAT)</li>
+            </ul>
+
+            <h3>2.2 WireGuard Server Setup via UniFi Interface</h3>
+
+            <div class="step">
+                <div class="step-header">
+                    <span class="step-number">1</span>
+                    <span class="step-title">Access VPN Settings</span>
+                </div>
+                <ol>
+                    <li>Open UniFi Network Console in browser</li>
+                    <li>Navigate to: <strong>Settings → VPN → VPN Server</strong></li>
+                    <li>Click <strong>Create New</strong> or <strong>+ Add VPN Server</strong></li>
+                </ol>
+            </div>
+
+            <div class="step">
+                <div class="step-header">
+                    <span class="step-number">2</span>
+                    <span class="step-title">Configure Server Parameters</span>
+                </div>
+                <div class="config-box">
+                    <div class="config-box-header">WireGuard Server Settings</div>
+                    <div class="config-box-body">
+                        <table>
+                            <tr><td><strong>Name</strong></td><td>Site-to-Site-VPN</td></tr>
+                            <tr><td><strong>VPN Type</strong></td><td>WireGuard</td></tr>
+                            <tr><td><strong>Server Address</strong></td><td>10.10.10.1/24</td></tr>
+                            <tr><td><strong>Listen Port</strong></td><td>51820</td></tr>
+                            <tr><td><strong>DNS</strong></td><td>Leave blank</td></tr>
+                        </table>
+                    </div>
+                </div>
+                <p>Click <strong>Save</strong> after entering values.</p>
+            </div>
+
+            <div class="step">
+                <div class="step-header">
+                    <span class="step-number">3</span>
+                    <span class="step-title">Record Server Keys</span>
+                </div>
+                <p>After creation, locate and record:</p>
+                <table>
+                    <thead>
+                        <tr><th>Key Type</th><th>Purpose</th><th>Action</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Server Public Key</td><td>Share with clients</td><td>Record this value</td></tr>
+                        <tr><td>Server Private Key</td><td>Server authentication</td><td>Keep secure, do not share</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="step">
+                <div class="step-header">
+                    <span class="step-number">4</span>
+                    <span class="step-title">Create Peer for CGU Client</span>
+                </div>
+                <p>Navigate to <strong>Peers</strong> section, click <strong>Add Peer</strong></p>
+                <div class="config-box">
+                    <div class="config-box-header">Peer Configuration - CGU Client</div>
+                    <div class="config-box-body">
+                        <table>
+                            <tr><td><strong>Name</strong></td><td>CGU-Client-Site</td></tr>
+                            <tr><td><strong>Public Key</strong></td><td>(Enter after generating on CGU Client)</td></tr>
+                            <tr><td><strong>Tunnel IP</strong></td><td>10.10.10.2/32</td></tr>
+                            <tr><td><strong>Allowed IPs</strong></td><td>10.10.10.2/32, 192.168.1.0/24</td></tr>
+                            <tr><td><strong>Persistent Keepalive</strong></td><td>25</td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-header">
+                    <span class="step-number">5</span>
+                    <span class="step-title">Create Peer for RUT200</span>
+                </div>
+                <p>Click <strong>Add Peer</strong> again</p>
+                <div class="config-box">
+                    <div class="config-box-header">Peer Configuration - RUT200</div>
+                    <div class="config-box-body">
+                        <table>
+                            <tr><td><strong>Name</strong></td><td>RUT200-4G-Site</td></tr>
+                            <tr><td><strong>Public Key</strong></td><td>(Enter after generating on RUT200)</td></tr>
+                            <tr><td><strong>Tunnel IP</strong></td><td>10.10.10.3/32</td></tr>
+                            <tr><td><strong>Allowed IPs</strong></td><td>10.10.10.3/32, 192.168.2.0/24</td></tr>
+                            <tr><td><strong>Persistent Keepalive</strong></td><td>25</td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <h3>2.3 WireGuard Server Setup via CLI</h3>
+
+            <h4>Step 1: Connect via SSH</h4>
+            <div class="code-container">
+                <pre><code>ssh root@&lt;CGU-Server-IP&gt;</code></pre>
+            </div>
+
+            <h4>Step 2: Generate Server Keys</h4>
+            <div class="code-container">
+                <pre><code>mkdir -p /config/wireguard
+
+wg genkey | tee /config/wireguard/server_private.key
+
+cat /config/wireguard/server_private.key | wg pubkey \
+    > /config/wireguard/server_public.key
+
+cat /config/wireguard/server_public.key</code></pre>
+            </div>
+
+            <h4>Step 3: Create Configuration File</h4>
+            <div class="code-container">
+                <pre><code>cat > /config/wireguard/wg0.conf << 'EOF'
+[Interface]
+PrivateKey = &lt;SERVER_PRIVATE_KEY&gt;
+Address = 10.10.10.1/24
+ListenPort = 51820
+PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; \
+         iptables -A FORWARD -o wg0 -j ACCEPT; \
+         iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; \
+           iptables -D FORWARD -o wg0 -j ACCEPT; \
+           iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+
+[Peer]
+# CGU Client
+PublicKey = &lt;CGU_CLIENT_PUBLIC_KEY&gt;
+AllowedIPs = 10.10.10.2/32, 192.168.1.0/24
+PersistentKeepalive = 25
+
+[Peer]
+# RUT200
+PublicKey = &lt;RUT200_PUBLIC_KEY&gt;
+AllowedIPs = 10.10.10.3/32, 192.168.2.0/24
+PersistentKeepalive = 25
+EOF</code></pre>
+            </div>
+
+            <h4>Step 4: Enable WireGuard Interface</h4>
+            <div class="code-container">
+                <pre><code>wg-quick up wg0
+
+wg show</code></pre>
+            </div>
+
+            <h4>Step 5: Configure Persistence</h4>
+            <div class="code-container">
+                <pre><code>cat > /config/scripts/post-config.d/wireguard.sh << 'EOF'
+#!/bin/bash
+wg-quick up /config/wireguard/wg0.conf
+EOF
+
+chmod +x /config/scripts/post-config.d/wireguard.sh</code></pre>
+            </div>
+
+            <h3>2.4 Static Routes Configuration</h3>
+
+            <h4>Via UniFi Interface</h4>
+            <p>Navigate to: <strong>Settings → Routes → Static Routes</strong></p>
+
+            <div class="grid">
+                <div class="grid-item">
+                    <h4>Route 1: CGU Client Network</h4>
+                    <table>
+                        <tr><td><strong>Name</strong></td><td>Route-to-CGU-Client</td></tr>
+                        <tr><td><strong>Destination</strong></td><td>192.168.1.0/24</td></tr>
+                        <tr><td><strong>Next Hop</strong></td><td>10.10.10.2</td></tr>
+                        <tr><td><strong>Distance</strong></td><td>1</td></tr>
+                        <tr><td><strong>Interface</strong></td><td>WireGuard (wg0)</td></tr>
+                    </table>
+                </div>
+                <div class="grid-item">
+                    <h4>Route 2: RUT200 Network</h4>
+                    <table>
+                        <tr><td><strong>Name</strong></td><td>Route-to-RUT200</td></tr>
+                        <tr><td><strong>Destination</strong></td><td>192.168.2.0/24</td></tr>
+                        <tr><td><strong>Next Hop</strong></td><td>10.10.10.3</td></tr>
+                        <tr><td><strong>Distance</strong></td><td>1</td></tr>
+                        <tr><td><strong>Interface</strong></td><td>WireGuard (wg0)</td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <h4>Via CLI</h4>
+            <div class="code-container">
+                <pre><code>configure
+
+set protocols static route 192.168.1.0/24 next-hop 10.10.10.2
+set protocols static route 192.168.2.0/24 next-hop 10.10.10.3
+
+commit
+save
+exit</code></pre>
+            </div>
+
+            <h3>2.5 Firewall Rules Configuration</h3>
+
+            <h4>Via UniFi Interface</h4>
+            <p>Navigate to: <strong>Settings → Firewall & Security → Firewall Rules</strong></p>
+            <p>Create rules under <strong>LAN In</strong> section:</p>
+
+            <div class="config-box">
+                <div class="config-box-header">Rule 1: Allow CGU Client to LAN1</div>
+                <div class="config-box-body">
+                    <table>
+                        <tr><td><strong>Type</strong></td><td>LAN In</td></tr>
+                        <tr><td><strong>Name</strong></td><td>Allow-CGU-Client-to-LAN1</td></tr>
+                        <tr><td><strong>Action</strong></td><td>Accept</td></tr>
+                        <tr><td><strong>Source</strong></td><td>192.168.1.0/24</td></tr>
+                        <tr><td><strong>Destination</strong></td><td>10.20.1.0/24</td></tr>
+                        <tr><td><strong>Protocol</strong></td><td>All</td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="config-box">
+                <div class="config-box-header">Rule 2: Allow LAN1 to CGU Client</div>
+                <div class="config-box-body">
+                    <table>
+                        <tr><td><strong>Type</strong></td><td>LAN In</td></tr>
+                        <tr><td><strong>Name</strong></td><td>Allow-LAN1-to-CGU-Client</td></tr>
+                        <tr><td><strong>Action</strong></td><td>Accept</td></tr>
+                        <tr><td><strong>Source</strong></td><td>10.20.1.0/24</td></tr>
+                        <tr><td><strong>Destination</strong></td><td>192.168.1.0/24</td></tr>
+                        <tr><td><strong>Protocol</strong></td><td>All</td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="config-box">
+                <div class="config-box-header">Rule 3: Allow RUT200 to LAN2</div>
+                <div class="config-box-body">
+                    <table>
+                        <tr><td><strong>Type</strong></td><td>LAN In</td></tr>
+                        <tr><td><strong>Name</strong></td><td>Allow-RUT200-to-LAN2</td></tr>
+                        <tr><td><strong>Action</strong></td><td>Accept</td></tr>
+                        <tr><td><strong>Source</strong></td><td>192.168.2.0/24</td></tr>
+                        <tr><td><strong>Destination</strong></td><td>10.20.2.0/24</td></tr>
+                        <tr><td><strong>Protocol</strong></td><td>All</td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="config-box">
+                <div class="config-box-header">Rule 4: Allow LAN2 to RUT200</div>
+                <div class="config-box-body">
+                    <table>
+                        <tr><td><strong>Type</strong></td><td>LAN In</td></tr>
+                        <tr><td><strong>Name</strong></td><td>Allow-LAN2-to-RUT200</td></tr>
+                        <tr><td><strong>Action</strong></td><td>Accept</td></tr>
+                        <tr><td><strong>Source</strong></td><td>10.20.2.0/24</td></tr>
+                        <tr><td><strong>Destination</strong></td><td>192.168.2.0/24</td></tr>
+                        <tr><td><strong>Protocol</strong></td><td>All</td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="config-box">
+                <div class="config-box-header">Rule 5: Block CGU Client to LAN2</div>
+                <div class="config-box-body">
+                    <table>
+                        <tr><td><strong>Type</strong></td><td>LAN In</td></tr>
+                        <tr><td><strong>Name</strong></td><td>Block-CGU-Client-to-LAN2</td></tr>
+                        <tr><td><strong>Action</strong></td><td>Drop</td></tr>
+                        <tr><td><strong>Source</strong></td><td>192.168.1.0/24</td></tr>
+                        <tr><td><strong>Destination</strong></td><td>10.20.2.0/24</td></tr>
+                        <tr><td><strong>Protocol</strong></td><td>All</td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="config-box">
+                <div class="config-box-header">Rule 6: Block RUT200 to LAN1</div>
+                <div class="config-box-body">
+                    <table>
+                        <tr><td><strong>Type</strong></td><td>LAN In</td></tr>
+                        <tr><td><strong>Name</strong></td><td>Block-RUT200-to-LAN1</td></tr>
+                        <tr><td><strong>Action</strong></td><td>Drop</td></tr>
+                        <tr><td><strong>Source</strong></td><td>192.168.2.0/24</td></tr>
+                        <tr><td><strong>Destination</strong></td><td>10.20.1.0/24</td></tr>
+                        <tr><td><strong>Protocol</strong></td><td>All</td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <h4>Via CLI</h4>
+            <div class="code-container">
+                <pre><code>configure
+
+# Create firewall ruleset
+set firewall name WG_IN default-action drop
+
+set firewall name WG_IN rule 10 action accept
+set firewall name WG_IN rule 10 state established enable
+set firewall name WG_IN rule 10 state related enable
+
+set firewall name WG_IN rule 20 action accept
+set firewall name WG_IN rule 20 source address 192.168.1.0/24
+set firewall name WG_IN rule 20 destination address 10.20.1.0/24
+set firewall name WG_IN rule 20 description "Allow CGU Client to LAN1"
+
+set firewall name WG_IN rule 30 action accept
+set firewall name WG_IN rule 30 source address 192.168.2.0/24
+set firewall name WG_IN rule 30 destination address 10.20.2.0/24
+set firewall name WG_IN rule 30 description "Allow RUT200 to LAN2"
+
+set firewall name WG_IN rule 40 action drop
+set firewall name WG_IN rule 40 source address 192.168.1.0/24
+set firewall name WG_IN rule 40 destination address 10.20.2.0/24
+set firewall name WG_IN rule 40 description "Block CGU Client to LAN2"
+
+set firewall name WG_IN rule 50 action drop
+set firewall name WG_IN rule 50 source address 192.168.2.0/24
+set firewall name WG_IN rule 50 destination address 10.20.1.0/24
+set firewall name WG_IN rule 50 description "Block RUT200 to LAN1"
+
+set interfaces wireguard wg0 firewall in name WG_IN
+
+commit
+save
+exit</code></pre>
+            </div>
+        </section>
+
+        <!-- Section 3: CGU Client Configuration -->
+        <section id="client1">
+            <h2>📱 Section 3: VPN Client 1 Configuration (CGU Client)</h2>
+
+            <h3>3.1 Pre-Configuration Requirements</h3>
+            <ul class="checklist">
+                <li>Administrative access to CGU Client</li>
+                <li>VPN Server public key obtained</li>
+                <li>VPN Server public IP or hostname known</li>
+            </ul>
+
+            <h3>3.2 Generate Client Keys</h3>
+            <h4>Via SSH</h4>
+            <div class="code-container">
+                <pre><code>ssh root@&lt;CGU-Client-IP&gt;
+
+mkdir -p /config/wireguard
+
+wg genkey | tee /config/wireguard/client_private.key
+
+cat /config/wireguard/client_private.key | wg pubkey \
+    > /config/wireguard/client_public.key
+
+cat /config/wireguard/client_public.key</code></pre>
+            </div>
+
+            <div class="info-box warning">
+                <strong>⚠️ Important</strong>
+                Send the public key to VPN Server administrator.
+            </div>
+
+            <h3>3.3 WireGuard Client Setup via UniFi Interface</h3>
+
+            <div class="step">
+                <div class="step-header">
+                    <span class="step-number">1</span>
+                    <span class="step-title">Access VPN Settings</span>
+                </div>
+                <ol>
+                    <li>Navigate to: <strong>Settings → VPN → VPN Client</strong></li>
+                    <li>Click <strong>Create New</strong></li>
+                    <li>Select <strong>WireGuard</strong></li>
+                </ol>
+            </div>
+
+            <div class="step">
+                <div class="step-header">
+                    <span class="step-number">2</span>
+                    <span class="step-title">Configure Interface Settings</span>
+                </div>
+                <div class="config-box">
+                    <div class="config-box-header">Interface Settings</div>
+                    <div class="config-box-body">
+                        <table>
+                            <tr><td><strong>Name</strong></td><td>Site-to-Site-to-Main</td></tr>
+                            <tr><td><strong>VPN Type</strong></td><td>WireGuard</td></tr>
+                            <tr><td><strong>Private Key</strong></td><td>(Generated client private key)</td></tr>
+                            <tr><td><strong>Address</strong></td><td>10.10.10.2/32</td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-header">
+                    <span class="step-number">3</span>
+                    <span class="step-title">Configure Peer Settings</span>
+                </div>
+                <div class="config-box">
+                    <div class="config-box-header">Peer Settings (VPN Server)</div>
+                    <div class="config-box-body">
+                        <table>
+                            <tr><td><strong>Public Key</strong></td><td>(VPN Server public key)</td></tr>
+                            <tr><td><strong>Endpoint</strong></td><td>&lt;VPN_SERVER_PUBLIC_IP&gt;:51820</td></tr>
+                            <tr><td><strong>Allowed IPs</strong></td><td>10.10.10.0/24, 10.20.1.0/24</td></tr>
+                            <tr><td><strong>Persistent Keepalive</strong></td><td>25</td></tr>
+                        </table>
+                    </div>
+                </div>
+                <p>Click <strong>Save</strong> after configuration.</p>
+            </div>
+
+            <h3>3.4 WireGuard Client Setup via CLI</h3>
+
+            <h4>Create Configuration File</h4>
+            <div class="code-container">
+                <pre><code>ssh root@&lt;CGU-Client-IP&gt;
+
+cat > /config/wireguard/wg0.conf << 'EOF'
+[Interface]
+PrivateKey = &lt;CGU_CLIENT_PRIVATE_KEY&gt;
+Address = 10.10.10.2/32
+PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; \
+         iptables -A FORWARD -o wg0 -j ACCEPT
+PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; \
+           iptables -D FORWARD -o wg0 -j ACCEPT
+
+[Peer]
+PublicKey = &lt;VPN_SERVER_PUBLIC_KEY&gt;
+Endpoint = &lt;VPN_SERVER_PUBLIC_IP&gt;:51820
+AllowedIPs = 10.10.10.0/24, 10.20.1.0/24
+PersistentKeepalive = 25
+EOF</code></pre>
+            </div>
+
+            <h4>Enable Interface</h4>
+            <div class="code-container">
+                <pre><code>wg-quick up wg0</code></pre>
+            </div>
+
+            <h4>Configure Persistence</h4>
+            <div class="code-container">
+                <pre><code>cat > /config/scripts/post-config.d/wireguard.sh << 'EOF'
+#!/bin/bash
+wg-quick up /config/wireguard/wg0.conf
+EOF
+
+chmod +x /config/scripts/post-config.d/wireguard.sh</code></pre>
+            </div>
+
+            <h3>3.5 Static Route Configuration</h3>
+
+            <h4>Via UniFi Interface</h4>
+            <p>Navigate to: <strong>Settings → Routes → Static Routes</strong></p>
+            <div class="config-box">
+                <div class="config-box-header">Route to Server LAN1</div>
+                <div class="config-box-body">
+                    <table>
+                        <tr><td><strong>Name</strong></td><td>Route-to-Server-LAN1</td></tr>
+                        <tr><td><strong>Destination</strong></td><td>10.20.1.0/24</td></tr>
+                        <tr><td><strong>Next Hop</strong></td><td>10.10.10.1</td></tr>
+                        <tr><td><strong>Distance</strong></td><td>1</td></tr>
+                        <tr><td><strong>Interface</strong></td><td>WireGuard (wg0)</td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <h4>Via CLI</h4>
+            <div class="code-container">
+                <pre><code>configure
+
+set protocols static route 10.20.1.0/24 next-hop 10.10.10.1
+
+commit
+save
+exit</code></pre>
+            </div>
+
+            <h3>3.6 Firewall Configuration</h3>
+            <h4>Via CLI</h4>
+            <div class="code-container">
+                <pre><code>configure
+
+set firewall name VPN_TO_LAN default-action drop
+
+set firewall name VPN_TO_LAN rule 10 action accept
+set firewall name VPN_TO_LAN rule 10 state established enable
+set firewall name VPN_TO_LAN rule 10 state related enable
+
+set firewall name VPN_TO_LAN rule 20 action accept
+set firewall name VPN_TO_LAN rule 20 source address 10.20.1.0/24
+set firewall name VPN_TO_LAN rule 20 destination address 192.168.1.0/24
+set firewall name VPN_TO_LAN rule 20 description "Allow Server LAN1 to Local"
+
+commit
+save
+exit</code></pre>
+            </div>
+        </section>
+
+        <!-- Section 4: RUT200 Configuration -->
+        <section id="client2">
+            <h2>📡 Section 4: VPN Client 2 Configuration (Teltonika RUT200)</h2>
+
+            <h3>4.1 Pre-Configuration Requirements</h3>
+            <ul class="checklist">
+                <li>Administrative access to RUT200</li>
+                <li>VPN Server public key obtained</li>
+                <li>VPN Server public IP or hostname known</li>
+                <li>4G connectivity verified</li>
+            </ul>
+
+            <h3>4.2 Generate Client Keys</h3>
+
+            <h4>Via RUT200 Web Interface</h4>
+            <ol>
+                <li>Login to RUT200 at <strong>192.168.2.1</strong></li>
+                <li>Navigate to: <strong>Services → VPN → WireGuard</strong></li>
+                <li>Keys auto-generate when creating new instance</li>
+            </ol>
+
+            <h4>Via SSH</h4>
+            <div class="code-container">
+                <pre><code>ssh root@192.168.2.1
+
+wg genkey | tee /etc/wireguard/private.key
+
+cat /etc/wireguard/private.key | wg pubkey \
+    > /etc/wireguard/public.key
+
+cat /etc/wireguard/public.key</code></pre>
+            </div>
+
+            <div class="info-box warning">
+                <strong>⚠️ Important</strong>
+                Send the public key to VPN Server administrator.
+            </div>
+
+            <h3>4.3 WireGuard Setup via RUT200 Web Interface</h3>
+
+            <div class="step">
+                <div class="step-header">
+                    <span class="step-number">1</span>
+                    <span class="step-title">Create WireGuard Instance</span>
+                </div>
+                <ol>
+                    <li>Navigate to: <strong>Services → VPN → WireGuard</strong></li>
+                    <li>Click <strong>Add new instance</strong></li>
+                </ol>
+            </div>
+
+            <div class="step">
+                <div class="step-header">
+                    <span class="step-number">2</span>
+                    <span class="step-title">Configure Interface</span>
+                </div>
+                <div class="config-box">
+                    <div class="config-box-header">WireGuard Interface Settings</div>
+                    <div class="config-box-body">
+                        <table>
+                            <tr><td><strong>Enable</strong></td><td>Checked ✓</td></tr>
+                            <tr><td><strong>Name</strong></td><td>wg_main_site</td></tr>
+                            <tr><td><strong>Private Key</strong></td><td>(Auto-generated or enter manually)</td></tr>
+                            <tr><td><strong>IP Address</strong></td><td>10.10.10.3</td></tr>
+                            <tr><td><strong>Netmask</strong></td><td>255.255.255.0</td></tr>
+                            <tr><td><strong>Listen Port</strong></td><td>51820</td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-header">
+                    <span class="step-number">3</span>
+                    <span class="step-title">Add Peer</span>
+                </div>
+                <p>Click <strong>Add</strong> under Peers section</p>
+                <div class="config-box">
+                    <div class="config-box-header">Peer Configuration (VPN Server)</div>
+                    <div class="config-box-body">
+                        <table>
+                            <tr><td><strong>Enable</strong></td><td>Checked ✓</td></tr>
+                            <tr><td><strong>Description</strong></td><td>Main-Site-VPN-Server</td></tr>
+                            <tr><td><strong>Public Key</strong></td><td>(VPN Server public key)</td></tr>
+                            <tr><td><strong>Endpoint Host</strong></td><td>(VPN Server public IP)</td></tr>
+                            <tr><td><strong>Endpoint Port</strong></td><td>51820</td></tr>
+                            <tr><td><strong>Allowed IPs</strong></td><td>10.10.10.0/24, 10.20.2.0/24</td></tr>
+                            <tr><td><strong>Route Allowed IPs</strong></td><td>Checked ✓</td></tr>
+                            <tr><td><strong>Persistent Keepalive</strong></td><td>25</td></tr>
+                        </table>
+                    </div>
+                </div>
+                <p>Click <strong>Save & Apply</strong></p>
+            </div>
+
+            <h3>4.4 WireGuard Setup via RUT200 CLI</h3>
+
+            <h4>Install WireGuard (if needed)</h4>
+            <div class="code-container">
+                <pre><code>opkg update
+opkg install wireguard-tools</code></pre>
+            </div>
+
+            <h4>Configure via UCI</h4>
+            <div class="code-container">
+                <pre><code># Create WireGuard interface
+uci set network.wg0=interface
+uci set network.wg0.proto='wireguard'
+uci set network.wg0.private_key='&lt;RUT200_PRIVATE_KEY&gt;'
+uci set network.wg0.listen_port='51820'
+uci add_list network.wg0.addresses='10.10.10.3/24'
+
+# Add peer configuration
+uci add network wireguard_wg0
+uci set network.@wireguard_wg0[-1].public_key='&lt;VPN_SERVER_PUBLIC_KEY&gt;'
+uci set network.@wireguard_wg0[-1].endpoint_host='&lt;VPN_SERVER_PUBLIC_IP&gt;'
+uci set network.@wireguard_wg0[-1].endpoint_port='51820'
+uci set network.@wireguard_wg0[-1].persistent_keepalive='25'
+uci set network.@wireguard_wg0[-1].route_allowed_ips='1'
+uci add_list network.@wireguard_wg0[-1].allowed_ips='10.10.10.0/24'
+uci add_list network.@wireguard_wg0[-1].allowed_ips='10.20.2.0/24'
+
+# Apply configuration
+uci commit network
+/etc/init.d/network restart</code></pre>
+            </div>
+
+            <h3>4.5 Firewall Configuration</h3>
+
+            <h4>Via Web Interface</h4>
+            <p>Navigate to: <strong>Network → Firewall → General Settings</strong></p>
+            <p>Create new zone for WireGuard:</p>
+            <div class="config-box">
+                <div class="config-box-header">Firewall Zone for WireGuard</div>
+                <div class="config-box-body">
+                    <table>
+                        <tr><td><strong>Name</strong></td><td>wireguard</td></tr>
+                        <tr><td><strong>Input</strong></td><td>Accept</td></tr>
+                        <tr><td><strong>Output</strong></td><td>Accept</td></tr>
+                        <tr><td><strong>Forward</strong></td><td>Accept</td></tr>
+                        <tr><td><strong>Covered Networks</strong></td><td>wg0</td></tr>
+                        <tr><td><strong>Allow forward to</strong></td><td>lan</td></tr>
+                        <tr><td><strong>Allow forward from</strong></td><td>lan</td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <h4>Via CLI</h4>
+            <div class="code-container">
+                <pre><code># Create firewall zone
+uci add firewall zone
+uci set firewall.@zone[-1].name='wireguard'
+uci set firewall.@zone[-1].network='wg0'
+uci set firewall.@zone[-1].input='ACCEPT'
+uci set firewall.@zone[-1].output='ACCEPT'
+uci set firewall.@zone[-1].forward='ACCEPT'
+
+# Create forwarding rules
+uci add firewall forwarding
+uci set firewall.@forwarding[-1].src='lan'
+uci set firewall.@forwarding[-1].dest='wireguard'
+
+uci add firewall forwarding
+uci set firewall.@forwarding[-1].src='wireguard'
+uci set firewall.@forwarding[-1].dest='lan'
+
+# Apply configuration
+uci commit firewall
+/etc/init.d/firewall restart</code></pre>
+            </div>
+
+            <h3>4.6 Static Route Configuration</h3>
+
+            <h4>Via Web Interface</h4>
+            <p>Navigate to: <strong>Network → Routing → Static Routes</strong></p>
+            <div class="config-box">
+                <div class="config-box-header">Static Route to Server LAN2</div>
+                <div class="config-box-body">
+                    <table>
+                        <tr><td><strong>Interface</strong></td><td>wg0</td></tr>
+                        <tr><td><strong>Target</strong></td><td>10.20.2.0</td></tr>
+                        <tr><td><strong>Netmask</strong></td><td>255.255.255.0</td></tr>
+                        <tr><td><strong>Gateway</strong></td><td>10.10.10.1</td></tr>
+                        <tr><td><strong>Metric</strong></td><td>0</td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <h4>Via CLI</h4>
+            <div class="code-container">
+                <pre><code>uci add network route
+uci set network.@route[-1].interface='wg0'
+uci set network.@route[-1].target='10.20.2.0'
+uci set network.@route[-1].netmask='255.255.255.0'
+uci set network.@route[-1].gateway='10.10.10.1'
+
+uci commit network
+/etc/init.d/network restart</code></pre>
+            </div>
+        </section>
+
+        <!-- Section 5: Testing -->
+        <section id="testing">
+            <h2>🧪 Section 5: Verification and Testing</h2>
+
+            <h3>5.1 WireGuard Status Commands</h3>
+
+            <div class="grid">
+                <div class="grid-item">
+                    <h4>VPN Server</h4>
+                    <pre><code># Show WireGuard status
+wg show
+
+# Show interface details
+ip addr show wg0
+
+# Show routing table
+ip route | grep -E "192.168.1.0|192.168.2.0"</code></pre>
+                </div>
+                <div class="grid-item">
+                    <h4>CGU Client</h4>
+                    <pre><code>wg show
+ip addr show wg0
+ip route | grep "10.20.1.0"</code></pre>
+                </div>
+                <div class="grid-item">
+                    <h4>RUT200</h4>
+                    <pre><code>wg show
+ip addr show wg0
+ip route | grep "10.20.2.0"</code></pre>
+                </div>
+            </div>
+
+            <h3>5.2 Expected WireGuard Output</h3>
+            <div class="code-container">
+                <pre><code>interface: wg0
+  public key: &lt;PUBLIC_KEY&gt;
+  private key: (hidden)
+  listening port: 51820
+
+peer: &lt;PEER_PUBLIC_KEY&gt;
+  endpoint: &lt;IP&gt;:&lt;PORT&gt;
+  allowed ips: &lt;NETWORKS&gt;
+  latest handshake: X seconds ago
+  transfer: X.XX MiB received, X.XX MiB sent</code></pre>
+            </div>
+
+            <h3>5.3 Connectivity Test Matrix</h3>
+
+            <h4>Tests from VPN Server</h4>
+            <table>
+                <thead>
+                    <tr><th>Test</th><th>Command</th><th>Expected Result</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Ping CGU Client Tunnel</td><td><code>ping 10.10.10.2</code></td><td><span class="badge success">Success</span></td></tr>
+                    <tr><td>Ping CGU Client LAN</td><td><code>ping 192.168.1.x</code></td><td><span class="badge success">Success</span></td></tr>
+                    <tr><td>Ping RUT200 Tunnel</td><td><code>ping 10.10.10.3</code></td><td><span class="badge success">Success</span></td></tr>
+                    <tr><td>Ping RUT200 LAN</td><td><code>ping 192.168.2.x</code></td><td><span class="badge success">Success</span></td></tr>
+                </tbody>
+            </table>
+
+            <h4>Tests from CGU Client</h4>
+            <table>
+                <thead>
+                    <tr><th>Test</th><th>Command</th><th>Expected Result</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Ping VPN Server Tunnel</td><td><code>ping 10.10.10.1</code></td><td><span class="badge success">Success</span></td></tr>
+                    <tr><td>Ping Server LAN1</td><td><code>ping 10.20.1.x</code></td><td><span class="badge success">Success</span></td></tr>
+                    <tr><td>Ping Server LAN2</td><td><code>ping 10.20.2.x</code></td><td><span class="badge danger">FAIL (Blocked)</span></td></tr>
+                </tbody>
+            </table>
+
+            <h4>Tests from RUT200</h4>
+            <table>
+                <thead>
+                    <tr><th>Test</th><th>Command</th><th>Expected Result</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Ping VPN Server Tunnel</td><td><code>ping 10.10.10.1</code></td><td><span class="badge success">Success</span></td></tr>
+                    <tr><td>Ping Server LAN2</td><td><code>ping 10.20.2.x</code></td><td><span class="badge success">Success</span></td></tr>
+                    <tr><td>Ping Server LAN1</td><td><code>ping 10.20.1.x</code></td><td><span class="badge danger">FAIL (Blocked)</span></td></tr>
+                </tbody>
+            </table>
+
+            <h4>Tests from LAN1 Devices (10.20.1.x)</h4>
+            <table>
+                <thead>
+                    <tr><th>Test</th><th>Command</th><th>Expected Result</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Ping CGU Client LAN</td><td><code>ping 192.168.1.x</code></td><td><span class="badge success">Success</span></td></tr>
+                    <tr><td>Ping RUT200 LAN</td><td><code>ping 192.168.2.x</code></td><td><span class="badge danger">FAIL (Blocked)</span></td></tr>
+                </tbody>
+            </table>
+
+            <h4>Tests from LAN2 Devices (10.20.2.x)</h4>
+            <table>
+                <thead>
+                    <tr><th>Test</th><th>Command</th><th>Expected Result</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Ping RUT200 LAN</td><td><code>ping 192.168.2.x</code></td><td><span class="badge success">Success</span></td></tr>
+                    <tr><td>Ping CGU Client LAN</td><td><code>ping 192.168.1.x</code></td><td><span class="badge danger">FAIL (Blocked)</span></td></tr>
+                </tbody>
+            </table>
+
+            <h3>5.4 Troubleshooting Commands</h3>
+            <table>
+                <thead>
+                    <tr><th>Purpose</th><th>Command</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>WireGuard logs</td><td><code>journalctl -u wg-quick@wg0 -f</code></td></tr>
+                    <tr><td>Firewall rules</td><td><code>iptables -L -n -v</code></td></tr>
+                    <tr><td>NAT rules</td><td><code>iptables -t nat -L -n -v</code></td></tr>
+                    <tr><td>Full routing table</td><td><code>ip route show table all</code></td></tr>
+                    <tr><td>Trace route</td><td><code>traceroute &lt;destination&gt;</code></td></tr>
+                    <tr><td>Port connectivity</td><td><code>nc -zvu &lt;IP&gt; 51820</code></td></tr>
+                    <tr><td>Traffic capture</td><td><code>tcpdump -i wg0 -n</code></td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Section 6: Quick Reference -->
+        <section id="reference">
+            <h2>📋 Section 6: Quick Reference</h2>
+
+            <h3>6.1 Key Exchange Summary</h3>
+            <table>
+                <thead>
+                    <tr><th>Device</th><th>Shares Public Key With</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>VPN Server</td><td>CGU Client, RUT200</td></tr>
+                    <tr><td>CGU Client</td><td>VPN Server</td></tr>
+                    <tr><td>RUT200</td><td>VPN Server</td></tr>
+                </tbody>
+            </table>
+
+            <div class="info-box danger">
+                <strong>🔒 Security Note</strong>
+                Never share private keys. Only public keys are exchanged between devices.
+            </div>
+
+            <h3>6.2 Port Requirements</h3>
+            <table>
+                <thead>
+                    <tr><th>Location</th><th>Port</th><th>Protocol</th><th>Direction</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>VPN Server WAN</td><td>51820</td><td>UDP</td><td>Inbound</td></tr>
+                </tbody>
+            </table>
+
+            <div class="info-box note">
+                <strong>📝 Note</strong>
+                If VPN Server is behind NAT, forward UDP port 51820 to CGU internal IP address.
+            </div>
+
+            <h3>6.3 Configuration Checklist</h3>
+
+            <div class="grid">
+                <div class="grid-item">
+                    <h4>VPN Server (Main CGU)</h4>
+                    <ul class="checklist">
+                        <li>WireGuard server created with IP 10.10.10.1/24</li>
+                        <li>Peer for CGU Client configured</li>
+                        <li>Peer for RUT200 configured</li>
+                        <li>Static route to 192.168.1.0/24 via 10.10.10.2</li>
+                        <li>Static route to 192.168.2.0/24 via 10.10.10.3</li>
+                        <li>Firewall allows 192.168.1.0/24 ↔ 10.20.1.0/24</li>
+                        <li>Firewall allows 192.168.2.0/24 ↔ 10.20.2.0/24</li>
+                        <li>Firewall blocks cross-network access</li>
+                        <li>UDP 51820 accessible from internet</li>
+                    </ul>
+                </div>
+                <div class="grid-item">
+                    <h4>CGU Client</h4>
+                    <ul class="checklist">
+                        <li>WireGuard client configured with IP 10.10.10.2/32</li>
+                        <li>Server peer configured with correct public key</li>
+                        <li>Allowed IPs include 10.10.10.0/24 and 10.20.1.0/24</li>
+                        <li>Static route to 10.20.1.0/24 via 10.10.10.1</li>
+                        <li>Firewall allows bidirectional traffic</li>
+                    </ul>
+                </div>
+                <div class="grid-item">
+                    <h4>RUT200</h4>
+                    <ul class="checklist">
+                        <li>WireGuard interface configured with IP 10.10.10.3/24</li>
+                        <li>Server peer configured with correct public key</li>
+                        <li>Allowed IPs include 10.10.10.0/24 and 10.20.2.0/24</li>
+                        <li>Firewall zone created for WireGuard</li>
+                        <li>Forwarding enabled between LAN and WireGuard zones</li>
+                        <li>Static route to 10.20.2.0/24 configured</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>6.4 Complete Topology Reference</h3>
+            <div class="diagram">
+<pre>
+┌──────────────────────────────────────────────────────────────────┐
+│                        INTERNET                                  │
+└───────────────────────────┬──────────────────────────────────────┘
+                            │
+                            │ UDP 51820
+                            ▼
+┌──────────────────────────────────────────────────────────────────┐
+│                     VPN SERVER (CGU)                             │
+│  ┌─────────────────────────────────────────────────────────────┐ │
+│  │ WireGuard Interface: wg0                                    │ │
+│  │ Tunnel IP: 10.10.10.1/24                                    │ │
+│  │ Listen Port: 51820                                          │ │
+│  └─────────────────────────────────────────────────────────────┘ │
+│                                                                  │
+│  ┌─────────────────────┐    ┌─────────────────────┐              │
+│  │ Port 1 - LAN1       │    │ Port 2 - LAN2       │              │
+│  │ 10.20.1.1/24        │    │ 10.20.2.1/24        │              │
+│  │                     │    │                     │              │
+│  │ Accessible by:      │    │ Accessible by:      │              │
+│  │ CGU Client only     │    │ RUT200 only         │              │
+│  └──────────┬──────────┘    └──────────┬──────────┘              │
+└─────────────┼──────────────────────────┼─────────────────────────┘
+              │                          │
+              ▼                          ▼
+     ┌────────────────┐         ┌────────────────┐
+     │ LAN1 Devices   │         │ LAN2 Devices   │
+     │ 10.20.1.0/24   │         │ 10.20.2.0/24   │
+     └────────────────┘         └────────────────┘
+              ▲                          ▲
+              │                          │
+              │ WireGuard Tunnel         │ WireGuard Tunnel
+              │ (Bidirectional)          │ (Bidirectional)
+              │                          │
+┌─────────────┴──────────────┐ ┌─────────┴────────────────┐
+│      CGU CLIENT            │ │        RUT200            │
+│ ┌────────────────────────┐ │ │ ┌──────────────────────┐ │
+│ │ wg0: 10.10.10.2/32     │ │ │ │ wg0: 10.10.10.3/24   │ │
+│ └────────────────────────┘ │ │ └──────────────────────┘ │
+│ ┌────────────────────────┐ │ │ ┌──────────────────────┐ │
+│ │ LAN: 192.168.1.1/24    │ │ │ │ LAN: 192.168.2.1/24  │ │
+│ └────────────────────────┘ │ │ └──────────────────────┘ │
+│                            │ │ ┌──────────────────────┐ │
+│                            │ │ │ WAN: 4G Mobile       │ │
+│                            │ │ └──────────────────────┘ │
+└────────────┬───────────────┘ └───────────┬──────────────┘
+             │                             │
+             ▼                             ▼
+    ┌────────────────┐            ┌────────────────┐
+    │ Client Devices │            │ Client Devices │
+    │ 192.168.1.0/24 │            │ 192.168.2.0/24 │
+    └────────────────┘            └────────────────┘
+</pre>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p><strong>VPN Configuration Guide</strong></p>
+        <p>Unifi Cloud Gateway Ultra with WireGuard Site-to-Site VPN</p>
+        <p style="margin-top: 1rem; opacity: 0.7;">Version 1.0 | 2024</p>
+    </footer>
+
+    <!-- JavaScript for copy functionality -->
+    <script>
+        // Add copy buttons to code blocks
+        document.querySelectorAll('pre').forEach(function(codeBlock) {
+            const container = document.createElement('div');
+            container.className = 'code-container';
+            codeBlock.parentNode.insertBefore(container, codeBlock);
+            container.appendChild(codeBlock);
+
+            const copyButton = document.createElement('button');
+            copyButton.className = 'copy-btn';
+            copyButton.textContent = 'Copy';
+            container.appendChild(copyButton);
+
+            copyButton.addEventListener('click', function() {
+                const code = codeBlock.textContent;
+                navigator.clipboard.writeText(code).then(function() {
+                    copyButton.textContent = 'Copied!';
+                    setTimeout(function() {
+                        copyButton.textContent = 'Copy';
+                    }, 2000);
+                });
+            });
+        });
+
+        // Smooth scrolling for navigation
+        document.querySelectorAll('.nav a').forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Print function
+        function printGuide() {
+            window.print();
+        }
+    </script>
+</body>
+</html>
